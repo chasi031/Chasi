@@ -32,9 +32,19 @@
             overflow-x: hidden;
         }
 
-        header { padding: 25px 20px 10px; text-align: center; width: 100%; }
+        header { padding: 25px 20px 10px; text-align: center; width: 100%; position: relative; }
         header h1 { font-size: 1.5rem; margin: 5px 0; letter-spacing: 1px; font-weight: 800; }
         header p { font-size: 0.9rem; opacity: 0.7; margin: 0; }
+
+        .top-ctrl {
+            width: 90%; max-width: 500px;
+            display: flex; justify-content: flex-end; gap: 8px;
+            margin-bottom: 5px;
+        }
+        .btn-top-reset {
+            background: none; border: 1px solid #ddd; color: #888;
+            padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; cursor: pointer;
+        }
 
         .container {
             width: 100%; max-width: 500px;
@@ -42,87 +52,74 @@
             padding: 10px; gap: 15px;
         }
 
+        /* 통계 카드 스타일 수정 */
         .summary-card {
             width: 90%; background: white; padding: 18px;
             border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            display: flex; justify-content: space-around; border: 1px solid #eee;
+            display: flex; flex-direction: column; gap: 15px; border: 1px solid #eee;
         }
-        .summary-item { text-align: center; }
+        .summary-row { display: flex; justify-content: space-around; width: 100%; }
+        .summary-item { text-align: center; flex: 1; }
         .summary-item small { font-size: 0.75rem; display: block; margin-bottom: 5px; color: #888; }
-        .summary-item b { font-size: 1.2rem; color: var(--jg-purple); }
+        .summary-item b { font-size: 1.1rem; color: var(--jg-purple); }
+
+        .stats-tabs {
+            display: flex; background: #f0f0f0; border-radius: 8px; padding: 3px;
+            margin-top: 5px;
+        }
+        .tab-btn {
+            flex: 1; border: none; background: none; padding: 6px; font-size: 0.8rem;
+            border-radius: 6px; cursor: pointer; color: #777;
+        }
+        .tab-btn.active { background: white; color: var(--jg-purple); font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
         /* 저금통 영역 */
-        .box-section { position: relative; padding: 40px 0; z-index: 10; width: 100%; display: flex; justify-content: center; }
+        .box-section { position: relative; padding: 20px 0; z-index: 10; width: 100%; display: flex; justify-content: center; }
         .shimine-box {
-            width: 170px; height: 190px;
+            width: 140px; height: 160px;
             background: var(--wood-dark);
             border: 4px solid var(--jg-gold);
             border-radius: 12px;
             position: relative;
-            box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.2);
             display: flex; flex-direction: column; align-items: center;
         }
-        .slot {
-            width: 85px; height: 7px;
-            background: #1a1110; margin-top: 30px; border-radius: 4px;
-        }
+        .slot { width: 70px; height: 6px; background: #1a1110; margin-top: 25px; border-radius: 4px; }
         .lotus-icon {
-            margin-top: 25px; width: 65px; height: 65px;
+            margin-top: 20px; width: 50px; height: 50px;
             background-color: var(--jg-gold);
             -webkit-mask: url('https://www.svgrepo.com/show/397390/lotus.svg') no-repeat center;
             mask: url('https://www.svgrepo.com/show/397390/lotus.svg') no-repeat center;
             -webkit-mask-size: contain; mask-size: contain;
         }
-        .box-text {
-            position: absolute; bottom: 15px; color: var(--jg-gold);
-            font-size: 0.85rem; border: 1px solid var(--jg-gold); padding: 3px 10px;
-        }
+        .box-text { position: absolute; bottom: 12px; color: var(--jg-gold); font-size: 0.75rem; border: 1px solid var(--jg-gold); padding: 2px 8px; }
 
         /* 입력 및 버튼 */
         .input-area { width: 90%; display: flex; flex-direction: column; gap: 12px; }
-        #memo-input {
-            width: 100%; padding: 14px; border: 1px solid #ddd;
-            border-radius: 10px; font-size: 1rem; outline: none;
-        }
-
+        #memo-input { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; outline: none; }
         .money-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
-        .btn-money {
-            padding: 15px 5px; border: 1px solid #eee; border-radius: 10px;
-            font-weight: bold; font-size: 0.9rem; cursor: pointer;
-            transition: all 0.2s; background: white;
-        }
+        .btn-money { padding: 15px 5px; border: 1px solid #eee; border-radius: 10px; font-weight: bold; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; background: white; }
         .btn-money:active { transform: scale(0.92); background: #f0f0f0; }
         .btn-coin { background: #fafafa; }
         .btn-1000 { background: #E8F5E9; color: #2E7D32; }
-        
         .btn-custom { background: var(--jg-purple); color: white; border: none; }
         .btn-setting { background: #eee; border: 1px solid #ddd; border-radius: 10px; font-size: 1.2rem; cursor: pointer; }
 
         .history-section { width: 90%; margin-top: 10px; margin-bottom: 60px; }
         .history-title { font-size: 1.1rem; margin-bottom: 12px; display: block; border-bottom: 2px solid var(--jg-gold); padding-bottom: 8px; font-weight: bold; }
         .history-list { list-style: none; padding: 0; margin: 0; }
-        .history-item {
-            background: white; margin-bottom: 10px; padding: 15px;
-            border-radius: 12px; display: flex; justify-content: space-between;
-            align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-        }
+        .history-item { background: white; margin-bottom: 10px; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
         .history-info { display: flex; flex-direction: column; gap: 4px; }
         .history-memo { font-size: 0.9rem; color: #555; font-weight: 500; }
         .history-date { font-size: 0.7rem; color: #aaa; }
 
-        /* 애니메이션 효과 */
         @keyframes coin-up {
             0% { transform: translateY(0) scale(0.5); opacity: 0; }
             20% { opacity: 1; transform: translateY(-40px) scale(1.2); }
             80% { opacity: 1; transform: translateY(-100px) scale(1); }
             100% { opacity: 0; transform: translateY(-130px) scale(0.8); }
         }
-        .ani-money {
-            position: absolute; pointer-events: none; z-index: 999;
-            font-weight: 900; color: var(--ani-color); 
-            font-size: 1.8rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            animation: coin-up 1s forwards ease-out;
-        }
+        .ani-money { position: absolute; pointer-events: none; z-index: 999; font-weight: 900; color: var(--ani-color); font-size: 1.8rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); animation: coin-up 1s forwards ease-out; }
     </style>
 </head>
 <body>
@@ -132,15 +129,28 @@
     <h1>차시(差施) 기록장</h1>
 </header>
 
+<div class="top-ctrl">
+    <button class="btn-top-reset" onclick="undoLast()">↩ 방금 취소</button>
+    <button class="btn-top-reset" onclick="clearAll()">전체 초기화</button>
+</div>
+
 <div class="container">
     <div class="summary-card">
-        <div class="summary-item">
-            <small>오늘 횟수</small>
-            <b id="today-count">0</b>
+        <div class="summary-row">
+            <div class="summary-item">
+                <small id="stats-label">오늘 횟수</small>
+                <b id="stats-count">0회</b>
+            </div>
+            <div class="summary-item">
+                <small id="stats-total-label">오늘 공덕액</small>
+                <b id="stats-amount">0원</b>
+            </div>
         </div>
-        <div class="summary-item">
-            <small>누적 공덕액</small>
-            <b id="total-amount">0</b>
+        <div class="stats-tabs">
+            <button class="tab-btn active" onclick="changeStats('today')">오늘</button>
+            <button class="tab-btn" onclick="changeStats('week')">이번 주</button>
+            <button class="tab-btn" onclick="changeStats('month')">이번 달</button>
+            <button class="tab-btn" onclick="changeStats('all')">전체</button>
         </div>
     </div>
 
@@ -173,30 +183,26 @@
     <div class="history-section">
         <span class="history-title">최근 수행 기록</span>
         <ul id="history-list" class="history-list"></ul>
-        <button onclick="clearAll()" style="width:100%; background:none; border:none; color:#bbb; font-size:0.8rem; margin-top:30px; text-decoration:underline; cursor:pointer;">기록 전체 삭제</button>
     </div>
 </div>
 
 <script>
     let chasiLog = JSON.parse(localStorage.getItem('myChasiLog')) || [];
     let customAmount = localStorage.getItem('customChasiAmount') || null;
+    let currentTab = 'today';
 
-    // 초기 실행
     updateUI();
 
     function addChasi(amount) {
         if (!amount || amount <= 0) return;
-
         const memoInput = document.getElementById('memo-input');
         const newEntry = {
             amount: parseInt(amount),
             memo: memoInput.value.trim(),
             timestamp: new Date().getTime()
         };
-
         chasiLog.push(newEntry);
-        localStorage.setItem('myChasiLog', JSON.stringify(chasiLog));
-
+        saveData();
         animateMoney(amount);
         updateUI();
         memoInput.value = "";
@@ -211,13 +217,49 @@
         setTimeout(() => aniNode.remove(), 1000);
     }
 
-    function updateUI() {
-        const total = chasiLog.reduce((sum, item) => sum + item.amount, 0);
-        const todayStr = new Date().toLocaleDateString();
-        const todayCount = chasiLog.filter(item => new Date(item.timestamp).toLocaleDateString() === todayStr).length;
+    function changeStats(type) {
+        currentTab = type;
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.innerText.includes(type === 'today' ? '오늘' : type === 'week' ? '주' : type === 'month' ? '달' : '전체')) {
+                btn.classList.add('active');
+            }
+        });
+        updateUI();
+    }
 
-        document.getElementById('total-amount').innerText = total.toLocaleString() + "원";
-        document.getElementById('today-count').innerText = todayCount + "회";
+    function updateUI() {
+        const now = new Date();
+        let filtered = [];
+        let label = "오늘";
+
+        if (currentTab === 'today') {
+            const todayStr = now.toLocaleDateString();
+            filtered = chasiLog.filter(item => new Date(item.timestamp).toLocaleDateString() === todayStr);
+            label = "오늘";
+        } else if (currentTab === 'week') {
+            const lastWeek = new Date(now.setDate(now.getDate() - 7)).getTime();
+            filtered = chasiLog.filter(item => item.timestamp >= lastWeek);
+            label = "최근 7일";
+        } else if (currentTab === 'month') {
+            const thisMonth = now.getMonth();
+            const thisYear = now.getFullYear();
+            filtered = chasiLog.filter(item => {
+                const d = new Date(item.timestamp);
+                return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+            });
+            label = "이번 달";
+        } else {
+            filtered = chasiLog;
+            label = "누적";
+        }
+
+        const totalAmount = filtered.reduce((sum, item) => sum + item.amount, 0);
+        
+        document.getElementById('stats-label').innerText = label + " 횟수";
+        document.getElementById('stats-total-label').innerText = label + " 공덕액";
+        document.getElementById('stats-count').innerText = filtered.length + "회";
+        document.getElementById('stats-amount').innerText = totalAmount.toLocaleString() + "원";
 
         const customText = document.getElementById('custom-text');
         customText.innerText = customAmount ? parseInt(customAmount).toLocaleString() + "원" : "금액 설정";
@@ -235,18 +277,32 @@
         document.getElementById('history-list').innerHTML = listHtml;
     }
 
-    // 커스텀 버튼 클릭 시
-    document.getElementById('custom-btn').onclick = function() {
-        if (customAmount) {
-            addChasi(parseInt(customAmount));
-        } else {
-            setCustomAmount();
+    function saveData() { localStorage.setItem('myChasiLog', JSON.stringify(chasiLog)); }
+
+    function undoLast() {
+        if (chasiLog.length === 0) return;
+        if (confirm("방금 입력하신 기록을 취소할까요?")) {
+            chasiLog.pop();
+            saveData();
+            updateUI();
         }
+    }
+
+    function clearAll() {
+        if (confirm("모든 기록을 삭제하시겠습니까?")) {
+            chasiLog = [];
+            saveData();
+            updateUI();
+        }
+    }
+
+    document.getElementById('custom-btn').onclick = function() {
+        if (customAmount) addChasi(parseInt(customAmount));
+        else setCustomAmount();
     };
 
-    // 금액 수정 함수 (어르신용 직관적 입력창)
     function setCustomAmount() {
-        const val = prompt("자주 차시할 금액을 입력해주세요.\n(예: 3000)", customAmount || "");
+        const val = prompt("자주 차시할 금액을 입력해주세요.", customAmount || "");
         if (val !== null) {
             const numVal = parseInt(val.replace(/[^0-9]/g, ''));
             if (!isNaN(numVal) && numVal > 0) {
@@ -257,15 +313,6 @@
             }
         }
     }
-
-    function clearAll() {
-        if (confirm("모든 수행 기록을 삭제하시겠습니까?")) {
-            chasiLog = [];
-            localStorage.removeItem('myChasiLog');
-            updateUI();
-        }
-    }
 </script>
-
 </body>
 </html>
