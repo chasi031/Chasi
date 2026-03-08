@@ -21,6 +21,7 @@
             --jg-gold: #C5A059;
             --wood-dark: #3E2723;
             --bg-light: #F8F7F2;
+            --ani-color: #FF5722; /* 애니메이션 숫자 색상 (주황계열로 눈에 띄게) */
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -52,7 +53,8 @@
         .summary-item small { font-size: 0.75rem; display: block; margin-bottom: 5px; color: #888; }
         .summary-item b { font-size: 1.2rem; color: var(--jg-purple); }
 
-        .box-section { position: relative; padding: 20px 0; }
+        /* 저금통 영역 */
+        .box-section { position: relative; padding: 40px 0; z-index: 10; }
         .shimine-box {
             width: 170px; height: 190px;
             background: var(--wood-dark);
@@ -78,12 +80,12 @@
             font-size: 0.85rem; border: 1px solid var(--jg-gold); padding: 3px 10px;
         }
 
+        /* 입력 및 버튼 */
         .input-area { width: 90%; display: flex; flex-direction: column; gap: 12px; }
         #memo-input {
             width: 100%; padding: 14px; border: 1px solid #ddd;
-            border-radius: 10px; font-size: 1rem; outline: none; transition: 0.3s;
+            border-radius: 10px; font-size: 1rem; outline: none;
         }
-        #memo-input:focus { border-color: var(--jg-gold); box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.2); }
 
         .money-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
         .btn-money {
@@ -94,7 +96,13 @@
         .btn-money:active { transform: scale(0.92); background: #f0f0f0; }
         .btn-coin { background: #fafafa; }
         .btn-1000 { background: #E8F5E9; color: #2E7D32; }
-        .btn-custom { background: var(--jg-purple); color: white; border: none; grid-column: span 1; }
+        
+        /* 커스텀 버튼 스타일 */
+        .btn-custom { 
+            background: var(--jg-purple); color: white; border: none; 
+            position: relative; overflow: hidden;
+        }
+        .edit-tip { font-size: 0.6rem; display: block; opacity: 0.7; font-weight: normal; }
 
         .history-section { width: 90%; margin-top: 10px; margin-bottom: 60px; }
         .history-title { font-size: 1.1rem; margin-bottom: 12px; display: block; border-bottom: 2px solid var(--jg-gold); padding-bottom: 8px; font-weight: bold; }
@@ -104,14 +112,13 @@
             border-radius: 12px; display: flex; justify-content: space-between;
             align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
-        .history-info b { font-size: 1rem; display: block; }
-        .history-memo { font-size: 0.85rem; color: #666; margin-top: 4px; display: block; }
-        .history-date { font-size: 0.75rem; color: #bbb; margin-top: 4px; display: block; }
 
+        /* 애니메이션 숫자: 저금통 위로 올라가게 조정 */
         .ani-money {
-            position: absolute; pointer-events: none; z-index: 100;
-            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-weight: bold; color: var(--jg-purple); font-size: 1.2rem;
+            position: absolute; pointer-events: none; z-index: 999;
+            transition: all 0.8s ease-out;
+            font-weight: 900; color: var(--ani-color); 
+            font-size: 1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -134,7 +141,7 @@
         </div>
     </div>
 
-    <div class="box-section">
+    <div class="box-section" id="ani-container">
         <div class="shimine-box">
             <div class="slot"></div>
             <div class="lotus-icon"></div>
@@ -150,7 +157,10 @@
             <button class="btn-money btn-coin" onclick="addChasi(500)">500</button>
             <button class="btn-money btn-1000" onclick="addChasi(1000)">1,000</button>
             <button class="btn-money btn-1000" onclick="addChasi(10000)">10,000</button>
-            <button class="btn-money btn-custom" id="custom-btn">금액 설정</button>
+            <button class="btn-money btn-custom" id="custom-btn">
+                <span id="custom-text">금액 설정</span>
+                <span class="edit-tip">길게 눌러 수정</span>
+            </button>
         </div>
     </div>
 
@@ -173,8 +183,8 @@
         document.getElementById('total-amount').innerText = total.toLocaleString() + "원";
         document.getElementById('today-count').innerText = todayCount + "회";
 
-        const customBtn = document.getElementById('custom-btn');
-        customBtn.innerText = customAmount ? parseInt(customAmount).toLocaleString() : "금액 설정";
+        const customText = document.getElementById('custom-text');
+        customText.innerText = customAmount ? parseInt(customAmount).toLocaleString() : "금액 설정";
 
         const listHtml = chasiLog.slice().reverse().slice(0, 10).map(item => `
             <li class="history-item">
@@ -186,78 +196,3 @@
                 <div style="color: var(--jg-gold); font-size: 1.5rem;">🙏</div>
             </li>
         `).join('');
-        
-        document.getElementById('history-list').innerHTML = listHtml || '<p style="text-align:center; font-size:0.9rem; opacity:0.5; margin-top:20px;">기록된 수행이 없습니다.</p>';
-    }
-
-    function addChasi(amount) {
-        if(!amount || amount <= 0) return;
-        const memo = document.getElementById('memo-input').value;
-        const newEntry = {
-            id: Date.now(),
-            amount: parseInt(amount),
-            memo: memo,
-            timestamp: new Date().toISOString()
-        };
-        chasiLog.push(newEntry);
-        localStorage.setItem('myChasiLog', JSON.stringify(chasiLog));
-        playAnimation(amount);
-        document.getElementById('memo-input').value = '';
-        setTimeout(updateUI, 500);
-    }
-
-    function setCustomAmount() {
-        const val = prompt("자주 차시하실 금액을 입력해주세요:", "3000");
-        if (val && !isNaN(val)) {
-            customAmount = val;
-            localStorage.setItem('customChasiAmount', val);
-            updateUI();
-        }
-    }
-
-    // 커스텀 버튼 제어
-    const cBtn = document.getElementById('custom-btn');
-    let pressTimer;
-
-    cBtn.addEventListener('click', () => {
-        if(!customAmount) setCustomAmount();
-        else addChasi(customAmount);
-    });
-
-    // 꾹 누르면 재설정 (모바일/데스크탑 공용)
-    const startPress = () => { pressTimer = setTimeout(setCustomAmount, 1000); };
-    const endPress = () => { clearTimeout(pressTimer); };
-    cBtn.addEventListener('touchstart', startPress);
-    cBtn.addEventListener('touchend', endPress);
-    cBtn.addEventListener('mousedown', startPress);
-    cBtn.addEventListener('mouseup', endPress);
-
-    function playAnimation(text) {
-        const el = document.createElement('div');
-        el.className = 'ani-money';
-        el.innerText = parseInt(text).toLocaleString() + '원';
-        el.style.left = '50%';
-        el.style.bottom = '200px';
-        el.style.transform = 'translateX(-50%)';
-        document.body.appendChild(el);
-        setTimeout(() => {
-            el.style.bottom = '60%';
-            el.style.opacity = '0';
-            el.style.transform = 'translateX(-50%) scale(0.5)';
-        }, 50);
-        setTimeout(() => el.remove(), 600);
-    }
-
-    function clearAll() {
-        if(confirm("모든 신행 기록을 지우시겠습니까?")) {
-            chasiLog = [];
-            localStorage.removeItem('myChasiLog');
-            updateUI();
-        }
-    }
-
-    updateUI();
-</script>
-
-</body>
-</html>
