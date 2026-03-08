@@ -13,15 +13,13 @@
     <link rel="apple-touch-icon" href="https://img.icons8.com/color/512/lotus.png">
     <link rel="icon" href="https://img.icons8.com/color/512/lotus.png">
 
-    <link rel="manifest" href='data:application/json,{"name":"심인 차시 기록장","short_name":"차시장","start_url":"index.html","display":"standalone","background_color":"#F8F7F2","theme_color":"#5D2A42","icons":[{"src":"https://img.icons8.com/color/512/lotus.png","sizes":"512x512","type":"image/png"}]}'>
-
     <style>
         :root {
             --jg-purple: #5D2A42;
             --jg-gold: #C5A059;
             --wood-dark: #3E2723;
             --bg-light: #F8F7F2;
-            --ani-color: #FF5722; /* 애니메이션 숫자 색상 (주황계열로 눈에 띄게) */
+            --ani-color: #FF5722;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -54,7 +52,7 @@
         .summary-item b { font-size: 1.2rem; color: var(--jg-purple); }
 
         /* 저금통 영역 */
-        .box-section { position: relative; padding: 40px 0; z-index: 10; }
+        .box-section { position: relative; padding: 40px 0; z-index: 10; width: 100%; display: flex; justify-content: center; }
         .shimine-box {
             width: 170px; height: 190px;
             background: var(--wood-dark);
@@ -97,12 +95,8 @@
         .btn-coin { background: #fafafa; }
         .btn-1000 { background: #E8F5E9; color: #2E7D32; }
         
-        /* 커스텀 버튼 스타일 */
-        .btn-custom { 
-            background: var(--jg-purple); color: white; border: none; 
-            position: relative; overflow: hidden;
-        }
-        .edit-tip { font-size: 0.6rem; display: block; opacity: 0.7; font-weight: normal; }
+        .btn-custom { background: var(--jg-purple); color: white; border: none; }
+        .btn-setting { background: #eee; border: 1px solid #ddd; border-radius: 10px; font-size: 1.2rem; cursor: pointer; }
 
         .history-section { width: 90%; margin-top: 10px; margin-bottom: 60px; }
         .history-title { font-size: 1.1rem; margin-bottom: 12px; display: block; border-bottom: 2px solid var(--jg-gold); padding-bottom: 8px; font-weight: bold; }
@@ -112,13 +106,22 @@
             border-radius: 12px; display: flex; justify-content: space-between;
             align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
+        .history-info { display: flex; flex-direction: column; gap: 4px; }
+        .history-memo { font-size: 0.9rem; color: #555; font-weight: 500; }
+        .history-date { font-size: 0.7rem; color: #aaa; }
 
-        /* 애니메이션 숫자: 저금통 위로 올라가게 조정 */
+        /* 애니메이션 효과 */
+        @keyframes coin-up {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            20% { opacity: 1; transform: translateY(-40px) scale(1.2); }
+            80% { opacity: 1; transform: translateY(-100px) scale(1); }
+            100% { opacity: 0; transform: translateY(-130px) scale(0.8); }
+        }
         .ani-money {
             position: absolute; pointer-events: none; z-index: 999;
-            transition: all 0.8s ease-out;
             font-weight: 900; color: var(--ani-color); 
-            font-size: 1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-size: 1.8rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: coin-up 1s forwards ease-out;
         }
     </style>
 </head>
@@ -157,10 +160,13 @@
             <button class="btn-money btn-coin" onclick="addChasi(500)">500</button>
             <button class="btn-money btn-1000" onclick="addChasi(1000)">1,000</button>
             <button class="btn-money btn-1000" onclick="addChasi(10000)">10,000</button>
-            <button class="btn-money btn-custom" id="custom-btn">
-                <span id="custom-text">금액 설정</span>
-                <span class="edit-tip">길게 눌러 수정</span>
-            </button>
+            
+            <div style="display: flex; gap: 4px;">
+                <button class="btn-money btn-custom" id="custom-btn" style="flex: 3;">
+                    <span id="custom-text">금액 설정</span>
+                </button>
+                <button class="btn-setting" onclick="setCustomAmount()" style="flex: 1.2;">⚙️</button>
+            </div>
         </div>
     </div>
 
@@ -175,6 +181,36 @@
     let chasiLog = JSON.parse(localStorage.getItem('myChasiLog')) || [];
     let customAmount = localStorage.getItem('customChasiAmount') || null;
 
+    // 초기 실행
+    updateUI();
+
+    function addChasi(amount) {
+        if (!amount || amount <= 0) return;
+
+        const memoInput = document.getElementById('memo-input');
+        const newEntry = {
+            amount: parseInt(amount),
+            memo: memoInput.value.trim(),
+            timestamp: new Date().getTime()
+        };
+
+        chasiLog.push(newEntry);
+        localStorage.setItem('myChasiLog', JSON.stringify(chasiLog));
+
+        animateMoney(amount);
+        updateUI();
+        memoInput.value = "";
+    }
+
+    function animateMoney(amount) {
+        const container = document.getElementById('ani-container');
+        const aniNode = document.createElement('div');
+        aniNode.className = 'ani-money';
+        aniNode.innerText = "+" + amount.toLocaleString();
+        container.appendChild(aniNode);
+        setTimeout(() => aniNode.remove(), 1000);
+    }
+
     function updateUI() {
         const total = chasiLog.reduce((sum, item) => sum + item.amount, 0);
         const todayStr = new Date().toLocaleDateString();
@@ -184,7 +220,7 @@
         document.getElementById('today-count').innerText = todayCount + "회";
 
         const customText = document.getElementById('custom-text');
-        customText.innerText = customAmount ? parseInt(customAmount).toLocaleString() : "금액 설정";
+        customText.innerText = customAmount ? parseInt(customAmount).toLocaleString() + "원" : "금액 설정";
 
         const listHtml = chasiLog.slice().reverse().slice(0, 10).map(item => `
             <li class="history-item">
@@ -196,3 +232,40 @@
                 <div style="color: var(--jg-gold); font-size: 1.5rem;">🙏</div>
             </li>
         `).join('');
+        document.getElementById('history-list').innerHTML = listHtml;
+    }
+
+    // 커스텀 버튼 클릭 시
+    document.getElementById('custom-btn').onclick = function() {
+        if (customAmount) {
+            addChasi(parseInt(customAmount));
+        } else {
+            setCustomAmount();
+        }
+    };
+
+    // 금액 수정 함수 (어르신용 직관적 입력창)
+    function setCustomAmount() {
+        const val = prompt("자주 차시할 금액을 입력해주세요.\n(예: 3000)", customAmount || "");
+        if (val !== null) {
+            const numVal = parseInt(val.replace(/[^0-9]/g, ''));
+            if (!isNaN(numVal) && numVal > 0) {
+                customAmount = numVal;
+                localStorage.setItem('customChasiAmount', numVal);
+                updateUI();
+                alert(numVal.toLocaleString() + "원으로 설정되었습니다.");
+            }
+        }
+    }
+
+    function clearAll() {
+        if (confirm("모든 수행 기록을 삭제하시겠습니까?")) {
+            chasiLog = [];
+            localStorage.removeItem('myChasiLog');
+            updateUI();
+        }
+    }
+</script>
+
+</body>
+</html>
