@@ -387,11 +387,23 @@
 
 <script>
 // ── 데이터 초기화 ──
+// 구버전 데이터 마이그레이션
+(function migrate() {
+    const old = localStorage.getItem('myChasiLog');
+    const newKey = localStorage.getItem('myChasiLog_v2');
+    if (old && !newKey) {
+        localStorage.setItem('myChasiLog_v2', old);
+    }
+})();
+
 let chasiLog = JSON.parse(localStorage.getItem('myChasiLog_v2')) || [];
 let settings = JSON.parse(localStorage.getItem('chasiSettings')) || {
     fixedAmounts: [10, 100, 500, 1000, 10000],
     memoPresets: ['감사한 마음으로', '발원하는 마음으로', '회향의 마음으로', '공덕을 쌓고자']
 };
+// 설정에 memoPresets 없으면 기본값 추가
+if (!settings.memoPresets) settings.memoPresets = ['감사한 마음으로', '발원하는 마음으로', '회향의 마음으로', '공덕을 쌓고자'];
+
 let currentStatsTab = 'today';
 let editMode = false;
 
@@ -401,6 +413,7 @@ init();
 function init() {
     renderMoneyGrid();
     renderMemoQuickButtons();
+    attachMemoInputListener();
     updateUI();
     updateSettingsModal();
 }
@@ -446,13 +459,12 @@ function selectMemoQuick(btn, text) {
     input.value = text;
 }
 
-// 메모 입력창 수동 입력 시 퀵버튼 선택 해제
-document.addEventListener('DOMContentLoaded', () => {
+function attachMemoInputListener() {
     const inp = document.getElementById('memo-input');
     if (inp) inp.addEventListener('input', () => {
         document.querySelectorAll('.btn-memo-quick').forEach(b => b.classList.remove('selected'));
     });
-});
+}
 
 
 function addChasi(amount) {
@@ -502,15 +514,17 @@ function getFiltered(type) {
         const todayStr = toDateStr(now);
         return chasiLog.filter(item => toDateStr(new Date(item.timestamp)) === todayStr);
     } else if (type === 'week') {
-        const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7); weekAgo.setHours(0,0,0,0);
-        return chasiLog.filter(item => item.timestamp >= weekAgo.getTime());
+        const weekAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7).getTime();
+        return chasiLog.filter(item => item.timestamp >= weekAgo);
     } else if (type === 'month') {
+        const m = now.getMonth();
+        const y = now.getFullYear();
         return chasiLog.filter(item => {
             const d = new Date(item.timestamp);
-            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            return d.getMonth() === m && d.getFullYear() === y;
         });
     }
-    return chasiLog;
+    return [...chasiLog];
 }
 
 function updateStats() {
