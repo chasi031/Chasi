@@ -123,6 +123,22 @@
         }
         #memo-input:focus { border-color: var(--jg-gold); }
 
+        /* ── MEMO QUICK BUTTONS ── */
+        .memo-quick-wrap { width: 100%; }
+        .memo-quick-label { font-size: 0.7rem; color: #aaa; letter-spacing: 1px; margin-bottom: 6px; }
+        .memo-quick-list { display: flex; flex-wrap: wrap; gap: 6px; }
+        .btn-memo-quick {
+            padding: 6px 13px; border: 1px solid var(--border);
+            border-radius: 20px; font-size: 0.8rem; cursor: pointer;
+            background: var(--card-bg); color: var(--jg-purple);
+            font-family: 'Noto Serif KR', serif;
+            transition: all 0.15s;
+        }
+        .btn-memo-quick:active, .btn-memo-quick.selected {
+            background: var(--jg-purple); color: var(--jg-gold-light);
+            border-color: var(--jg-purple);
+        }
+
         /* ── MONEY BUTTONS ── */
         .money-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; }
         .btn-money {
@@ -304,6 +320,9 @@
         <!-- 입력 -->
         <div class="input-area">
             <input type="text" id="memo-input" placeholder="어떤 마음으로 차시하시나요?" maxlength="25">
+            <div class="memo-quick-wrap" id="memo-quick-wrap">
+                <!-- JS 렌더링 -->
+            </div>
             <div class="money-grid" id="money-grid">
                 <!-- JS로 렌더링 -->
             </div>
@@ -343,6 +362,13 @@
             <button class="btn-add-amount" onclick="addAmountSlot()" style="margin-top:8px; width:100%;">+ 금액 추가</button>
         </div>
 
+        <!-- 마음 퀵버튼 설정 -->
+        <div class="setting-section">
+            <div class="setting-label">▪ 차시 마음 퀵버튼 (자주 쓰는 문구)</div>
+            <div id="memos-edit-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+            <button class="btn-add-amount" onclick="addMemoSlot()" style="margin-top:8px; width:100%;">+ 문구 추가</button>
+        </div>
+
         <!-- 저장 -->
         <button class="btn-setting-save" onclick="saveSettings()" style="width:100%; padding:13px; font-size:0.95rem; margin-bottom:10px;">
             💾 설정 저장
@@ -363,7 +389,8 @@
 // ── 데이터 초기화 ──
 let chasiLog = JSON.parse(localStorage.getItem('myChasiLog_v2')) || [];
 let settings = JSON.parse(localStorage.getItem('chasiSettings')) || {
-    fixedAmounts: [10, 100, 500, 1000, 10000]
+    fixedAmounts: [10, 100, 500, 1000, 10000],
+    memoPresets: ['감사한 마음으로', '발원하는 마음으로', '회향의 마음으로', '공덕을 쌓고자']
 };
 let currentStatsTab = 'today';
 let editMode = false;
@@ -373,6 +400,7 @@ init();
 
 function init() {
     renderMoneyGrid();
+    renderMemoQuickButtons();
     updateUI();
     updateSettingsModal();
 }
@@ -388,7 +416,45 @@ function renderMoneyGrid() {
     grid.innerHTML = html;
 }
 
-// ── 차시 추가 ──
+// ── 메모 퀵버튼 렌더링 ──
+function renderMemoQuickButtons() {
+    const wrap = document.getElementById('memo-quick-wrap');
+    const presets = settings.memoPresets || [];
+    if (presets.length === 0) { wrap.innerHTML = ''; return; }
+    wrap.innerHTML = `
+        <div class="memo-quick-label">마음 빠른 선택</div>
+        <div class="memo-quick-list">
+            ${presets.map(text => `
+                <button class="btn-memo-quick" onclick="selectMemoQuick(this, '${text.replace(/'/g,"\\'")}')">
+                    ${text}
+                </button>
+            `).join('')}
+        </div>
+    `;
+}
+
+function selectMemoQuick(btn, text) {
+    const input = document.getElementById('memo-input');
+    // 이미 선택된 버튼이면 해제
+    if (btn.classList.contains('selected')) {
+        btn.classList.remove('selected');
+        input.value = '';
+        return;
+    }
+    document.querySelectorAll('.btn-memo-quick').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    input.value = text;
+}
+
+// 메모 입력창 수동 입력 시 퀵버튼 선택 해제
+document.addEventListener('DOMContentLoaded', () => {
+    const inp = document.getElementById('memo-input');
+    if (inp) inp.addEventListener('input', () => {
+        document.querySelectorAll('.btn-memo-quick').forEach(b => b.classList.remove('selected'));
+    });
+});
+
+
 function addChasi(amount) {
     if (!amount || amount <= 0) return;
     const memoInput = document.getElementById('memo-input');
@@ -403,6 +469,7 @@ function addChasi(amount) {
     animateMoney(amount);
     updateUI();
     memoInput.value = "";
+    document.querySelectorAll('.btn-memo-quick').forEach(b => b.classList.remove('selected'));
 }
 
 function animateMoney(amount) {
@@ -546,6 +613,15 @@ function updateSettingsModal() {
             <button class="btn-remove-amount" onclick="removeAmountSlot(${i})">✕</button>
         </div>
     `).join('');
+
+    const memoList = document.getElementById('memos-edit-list');
+    const presets = settings.memoPresets || [];
+    memoList.innerHTML = presets.map((txt, i) => `
+        <div class="setting-row">
+            <input class="setting-input" type="text" value="${txt}" id="memo-preset-${i}" placeholder="차시 문구 입력" maxlength="25">
+            <button class="btn-remove-amount" onclick="removeMemoSlot(${i})" style="font-size:1rem; padding:4px 8px; border:1px solid #eee; border-radius:6px; color:#bbb; cursor:pointer;">✕</button>
+        </div>
+    `).join('');
 }
 
 function addAmountSlot() {
@@ -559,6 +635,17 @@ function removeAmountSlot(i) {
     updateSettingsModal();
 }
 
+function addMemoSlot() {
+    if (!settings.memoPresets) settings.memoPresets = [];
+    settings.memoPresets.push('');
+    updateSettingsModal();
+}
+
+function removeMemoSlot(i) {
+    settings.memoPresets.splice(i, 1);
+    updateSettingsModal();
+}
+
 function saveSettings() {
     const inputs = document.querySelectorAll('[id^="amt-input-"]');
     const newAmounts = [];
@@ -568,8 +655,18 @@ function saveSettings() {
     });
     if (newAmounts.length === 0) { alert('유효한 금액을 입력해주세요.'); return; }
     settings.fixedAmounts = newAmounts;
+
+    const memoInputs = document.querySelectorAll('[id^="memo-preset-"]');
+    const newMemos = [];
+    memoInputs.forEach(inp => {
+        const v = inp.value.trim();
+        if (v) newMemos.push(v);
+    });
+    settings.memoPresets = newMemos;
+
     localStorage.setItem('chasiSettings', JSON.stringify(settings));
     renderMoneyGrid();
+    renderMemoQuickButtons();
     closeSettings();
     alert('설정이 저장되었습니다 🙏');
 }
