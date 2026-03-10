@@ -4,122 +4,250 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>심인 차시 기록장</title>
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="차시 기록장">
     <meta name="mobile-web-app-capable" content="yes">
-    
     <link rel="apple-touch-icon" href="https://img.icons8.com/color/512/lotus.png">
     <link rel="icon" href="https://img.icons8.com/color/512/lotus.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --jg-purple: #5D2A42;
+            --jg-purple: #4A1F35;
             --jg-gold: #C5A059;
+            --jg-gold-light: #E8D5A3;
             --wood-dark: #3E2723;
-            --bg-light: #F8F7F2;
-            --ani-color: #FF5722;
+            --bg-light: #F5F2EC;
+            --card-bg: #FFFDF8;
+            --ani-color: #E65100;
+            --border: #E0D8CC;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body {
-            margin: 0; padding: 0;
             background-color: var(--bg-light);
-            font-family: 'Pretendard', -apple-system, sans-serif;
+            font-family: 'Noto Serif KR', serif;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh; color: var(--jg-purple);
             overflow-x: hidden;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C5A059' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
 
-        header { padding: 25px 20px 10px; text-align: center; width: 100%; position: relative; }
-        header h1 { font-size: 1.5rem; margin: 5px 0; letter-spacing: 1px; font-weight: 800; }
-        header p { font-size: 0.9rem; opacity: 0.7; margin: 0; }
-
-        .top-ctrl {
-            width: 90%; max-width: 500px;
-            display: flex; justify-content: flex-end; gap: 8px;
-            margin-bottom: 5px;
+        /* ── HEADER ── */
+        header {
+            padding: 28px 20px 12px;
+            text-align: center; width: 100%;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: relative;
         }
-        .btn-top-reset {
-            background: none; border: 1px solid #ddd; color: #888;
-            padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; cursor: pointer;
+        header p { font-size: 0.75rem; letter-spacing: 3px; opacity: 0.5; margin-bottom: 4px; text-transform: uppercase; }
+        header h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: 4px; color: var(--jg-purple); }
+        .header-btns {
+            position: absolute; top: 50%; right: 16px;
+            transform: translateY(-50%);
+            display: flex; gap: 6px;
+        }
+        .header-icon-btn {
+            background: none; border: 1px solid var(--border);
+            border-radius: 50%; width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; cursor: pointer; color: var(--jg-purple);
         }
 
+        /* ── MAIN TABS ── */
+        .main-tabs {
+            display: flex; width: 100%; max-width: 500px;
+            border-bottom: 2px solid var(--border);
+            background: var(--card-bg);
+        }
+        .main-tab {
+            flex: 1; padding: 12px; border: none; background: none;
+            font-family: 'Noto Serif KR', serif;
+            font-size: 0.85rem; cursor: pointer; color: #999;
+            border-bottom: 2px solid transparent; margin-bottom: -2px;
+        }
+        .main-tab.active { color: var(--jg-purple); border-bottom-color: var(--jg-gold); font-weight: 700; }
+
+        /* ── CONTAINER ── */
         .container {
             width: 100%; max-width: 500px;
             display: flex; flex-direction: column; align-items: center;
-            padding: 10px; gap: 15px;
+            padding: 16px 12px; gap: 14px;
         }
+        .page { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+        .page.hidden { display: none; }
 
-        /* 통계 카드 스타일 수정 */
+        /* ── SUMMARY CARD ── */
         .summary-card {
-            width: 90%; background: white; padding: 18px;
-            border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; gap: 15px; border: 1px solid #eee;
+            width: 100%; background: var(--card-bg); padding: 18px 20px;
+            border-radius: 14px; box-shadow: 0 4px 20px rgba(74,31,53,0.07);
+            border: 1px solid var(--border);
         }
-        .summary-row { display: flex; justify-content: space-around; width: 100%; }
+        .summary-row { display: flex; justify-content: space-around; width: 100%; margin-bottom: 14px; }
         .summary-item { text-align: center; flex: 1; }
-        .summary-item small { font-size: 0.75rem; display: block; margin-bottom: 5px; color: #888; }
-        .summary-item b { font-size: 1.1rem; color: var(--jg-purple); }
-
+        .summary-item small { font-size: 0.7rem; display: block; margin-bottom: 5px; color: #999; letter-spacing: 1px; }
+        .summary-item b { font-size: 1.15rem; color: var(--jg-purple); }
+        .divider-v { width: 1px; background: var(--border); margin: 0 10px; }
         .stats-tabs {
-            display: flex; background: #f0f0f0; border-radius: 8px; padding: 3px;
-            margin-top: 5px;
+            display: flex; background: #f0ece4; border-radius: 8px; padding: 3px;
         }
         .tab-btn {
-            flex: 1; border: none; background: none; padding: 6px; font-size: 0.8rem;
-            border-radius: 6px; cursor: pointer; color: #777;
+            flex: 1; border: none; background: none; padding: 7px 4px; font-size: 0.78rem;
+            border-radius: 6px; cursor: pointer; color: #888; font-family: 'Noto Serif KR', serif;
         }
-        .tab-btn.active { background: white; color: var(--jg-purple); font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .tab-btn.active { background: var(--card-bg); color: var(--jg-purple); font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
 
-        /* 저금통 영역 */
-        .box-section { position: relative; padding: 20px 0; z-index: 10; width: 100%; display: flex; justify-content: center; }
+        /* ── BOX ── */
+        .box-section { position: relative; padding: 10px 0; z-index: 10; width: 100%; display: flex; justify-content: center; }
         .shimine-box {
-            width: 140px; height: 160px;
+            width: 130px; height: 150px;
             background: var(--wood-dark);
-            border: 4px solid var(--jg-gold);
-            border-radius: 12px;
-            position: relative;
-            box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+            border: 3px solid var(--jg-gold);
+            border-radius: 12px; position: relative;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.05);
             display: flex; flex-direction: column; align-items: center;
         }
-        .slot { width: 70px; height: 6px; background: #1a1110; margin-top: 25px; border-radius: 4px; }
-        .lotus-icon {
-            margin-top: 20px; width: 50px; height: 50px;
-            background-color: var(--jg-gold);
-            -webkit-mask: url('https://www.svgrepo.com/show/397390/lotus.svg') no-repeat center;
-            mask: url('https://www.svgrepo.com/show/397390/lotus.svg') no-repeat center;
-            -webkit-mask-size: contain; mask-size: contain;
+        .slot { width: 65px; height: 5px; background: #111; margin-top: 22px; border-radius: 3px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); }
+        .lotus-icon { margin-top: 18px; font-size: 2.5rem; }
+        .box-text { position: absolute; bottom: 10px; color: var(--jg-gold); font-size: 0.72rem; border: 1px solid var(--jg-gold); padding: 2px 10px; letter-spacing: 2px; }
+
+        /* ── INPUT ── */
+        .input-area { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+        #memo-input {
+            width: 100%; padding: 13px 16px; border: 1px solid var(--border);
+            border-radius: 10px; font-size: 0.95rem; outline: none;
+            background: var(--card-bg); font-family: 'Noto Serif KR', serif;
+            color: var(--jg-purple);
         }
-        .box-text { position: absolute; bottom: 12px; color: var(--jg-gold); font-size: 0.75rem; border: 1px solid var(--jg-gold); padding: 2px 8px; }
+        #memo-input:focus { border-color: var(--jg-gold); }
 
-        /* 입력 및 버튼 */
-        .input-area { width: 90%; display: flex; flex-direction: column; gap: 12px; }
-        #memo-input { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; outline: none; }
-        .money-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
-        .btn-money { padding: 15px 5px; border: 1px solid #eee; border-radius: 10px; font-weight: bold; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; background: white; }
-        .btn-money:active { transform: scale(0.92); background: #f0f0f0; }
-        .btn-coin { background: #fafafa; }
-        .btn-1000 { background: #E8F5E9; color: #2E7D32; }
-        .btn-custom { background: var(--jg-purple); color: white; border: none; }
-        .btn-setting { background: #eee; border: 1px solid #ddd; border-radius: 10px; font-size: 1.2rem; cursor: pointer; }
+        /* ── MONEY BUTTONS ── */
+        .money-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; }
+        .btn-money {
+            padding: 14px 5px; border: 1px solid var(--border);
+            border-radius: 10px; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.15s;
+            background: var(--card-bg); font-family: 'Noto Serif KR', serif;
+            color: var(--jg-purple);
+        }
+        .btn-money:active { transform: scale(0.93); background: #ede8e0; }
+        .btn-fixed {
+            background: var(--jg-purple); color: var(--jg-gold-light);
+            border-color: var(--jg-purple); font-size: 0.85rem;
+        }
+        .btn-fixed:active { background: #3a1828; }
 
-        .history-section { width: 90%; margin-top: 10px; margin-bottom: 60px; }
-        .history-title { font-size: 1.1rem; margin-bottom: 12px; display: block; border-bottom: 2px solid var(--jg-gold); padding-bottom: 8px; font-weight: bold; }
-        .history-list { list-style: none; padding: 0; margin: 0; }
-        .history-item { background: white; margin-bottom: 10px; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-        .history-info { display: flex; flex-direction: column; gap: 4px; }
-        .history-memo { font-size: 0.9rem; color: #555; font-weight: 500; }
-        .history-date { font-size: 0.7rem; color: #aaa; }
+        /* ── HISTORY ── */
+        .history-section { width: 100%; margin-bottom: 40px; }
+        .history-title {
+            font-size: 1rem; margin-bottom: 12px; display: flex;
+            align-items: center; gap: 8px;
+            border-bottom: 1px solid var(--jg-gold-light); padding-bottom: 10px; font-weight: 700;
+        }
+        .history-title span { flex: 1; }
+        .history-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+        .history-item {
+            background: var(--card-bg); padding: 14px 16px;
+            border-radius: 12px; display: flex; justify-content: space-between;
+            align-items: center; border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(74,31,53,0.04);
+        }
+        .history-info { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+        .history-amount { font-size: 0.95rem; font-weight: 700; color: var(--jg-purple); }
+        .history-memo { font-size: 0.82rem; color: #777; }
+        .history-date { font-size: 0.68rem; color: #bbb; margin-top: 2px; }
+        .history-actions { display: flex; gap: 6px; margin-left: 10px; }
+        .btn-edit-item, .btn-del-item {
+            border: 1px solid var(--border); background: none;
+            border-radius: 6px; padding: 4px 8px; font-size: 0.72rem;
+            cursor: pointer; color: #888;
+        }
+        .btn-del-item { color: #c0392b; border-color: #fadbd8; }
 
+        /* ── PAST RECORDS ── */
+        .date-group { width: 100%; margin-bottom: 20px; }
+        .date-label {
+            font-size: 0.8rem; color: #999; letter-spacing: 1px;
+            margin-bottom: 8px; padding: 4px 0;
+            border-bottom: 1px dashed var(--border);
+        }
+        .date-group-total { float: right; color: var(--jg-gold); font-weight: 700; }
+
+        /* ── SETTINGS MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(30,10,20,0.6);
+            z-index: 1000; display: flex; align-items: flex-end;
+            backdrop-filter: blur(3px);
+            opacity: 0; pointer-events: none; transition: opacity 0.25s;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+        .modal-sheet {
+            background: var(--card-bg); width: 100%; max-width: 500px;
+            margin: 0 auto; border-radius: 20px 20px 0 0;
+            padding: 24px 20px 40px; max-height: 90vh; overflow-y: auto;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .modal-overlay.open .modal-sheet { transform: translateY(0); }
+        .modal-handle { width: 40px; height: 4px; background: #ddd; border-radius: 2px; margin: 0 auto 20px; }
+        .modal-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 20px; color: var(--jg-purple); letter-spacing: 2px; }
+        .setting-section { margin-bottom: 24px; }
+        .setting-label { font-size: 0.78rem; color: #888; letter-spacing: 1px; margin-bottom: 10px; }
+        .setting-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .setting-input {
+            flex: 1; padding: 10px 14px; border: 1px solid var(--border);
+            border-radius: 8px; font-size: 0.9rem; outline: none;
+            font-family: 'Noto Serif KR', serif; background: #fafafa;
+        }
+        .setting-input:focus { border-color: var(--jg-gold); }
+        .btn-setting-save {
+            padding: 10px 16px; background: var(--jg-purple); color: var(--jg-gold-light);
+            border: none; border-radius: 8px; font-size: 0.85rem; cursor: pointer;
+            font-family: 'Noto Serif KR', serif; font-weight: 700; white-space: nowrap;
+        }
+        .custom-amounts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .custom-amount-item {
+            display: flex; gap: 6px; align-items: center;
+            background: #f7f4ef; border-radius: 8px; padding: 8px 10px;
+        }
+        .custom-amount-item input {
+            flex: 1; border: none; background: none; font-size: 0.9rem;
+            font-family: 'Noto Serif KR', serif; color: var(--jg-purple); outline: none;
+            min-width: 0;
+        }
+        .btn-remove-amount { background: none; border: none; color: #ccc; cursor: pointer; font-size: 1rem; padding: 0 2px; }
+        .btn-add-amount {
+            border: 1px dashed var(--border); background: none;
+            border-radius: 8px; padding: 8px; font-size: 0.8rem;
+            cursor: pointer; color: #999; text-align: center;
+        }
+
+        /* 위험 영역 */
+        .danger-zone { margin-top: 30px; border-top: 1px dashed #f0ddd8; padding-top: 20px; }
+        .danger-zone .setting-label { color: #c0392b; }
+        .btn-danger {
+            padding: 9px 14px; border: 1px solid #f0ddd8; color: #c0392b;
+            background: none; border-radius: 8px; font-size: 0.8rem; cursor: pointer;
+            font-family: 'Noto Serif KR', serif; margin-right: 8px; margin-bottom: 8px;
+        }
+
+        /* ── ANIMATION ── */
         @keyframes coin-up {
             0% { transform: translateY(0) scale(0.5); opacity: 0; }
             20% { opacity: 1; transform: translateY(-40px) scale(1.2); }
-            80% { opacity: 1; transform: translateY(-100px) scale(1); }
-            100% { opacity: 0; transform: translateY(-130px) scale(0.8); }
+            80% { opacity: 1; transform: translateY(-110px) scale(1); }
+            100% { opacity: 0; transform: translateY(-140px) scale(0.8); }
         }
-        .ani-money { position: absolute; pointer-events: none; z-index: 999; font-weight: 900; color: var(--ani-color); font-size: 1.8rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); animation: coin-up 1s forwards ease-out; }
+        .ani-money {
+            position: absolute; pointer-events: none; z-index: 999;
+            font-weight: 900; color: var(--ani-color); font-size: 1.7rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+            animation: coin-up 1s forwards ease-out;
+        }
+
+        /* 빈 상태 */
+        .empty-state { text-align: center; padding: 40px 20px; color: #bbb; font-size: 0.85rem; line-height: 1.8; }
     </style>
 </head>
 <body>
@@ -127,192 +255,412 @@
 <header>
     <p>나의 일상 수행 기록</p>
     <h1>차시(差施) 기록장</h1>
+    <div class="header-btns">
+        <button class="header-icon-btn" onclick="openSettings()" title="설정">⚙️</button>
+    </div>
 </header>
 
-<div class="top-ctrl">
-    <button class="btn-top-reset" onclick="undoLast()">↩ 방금 취소</button>
-    <button class="btn-top-reset" onclick="clearAll()">전체 초기화</button>
+<!-- 메인 탭 -->
+<div class="main-tabs">
+    <button class="main-tab active" onclick="switchPage('main')">차시 기록</button>
+    <button class="main-tab" onclick="switchPage('past')">지난 기록</button>
 </div>
 
 <div class="container">
-    <div class="summary-card">
-        <div class="summary-row">
-            <div class="summary-item">
-                <small id="stats-label">오늘 횟수</small>
-                <b id="stats-count">0회</b>
+
+    <!-- ═══ 차시 기록 페이지 ═══ -->
+    <div class="page" id="page-main">
+
+        <!-- 통계 카드 -->
+        <div class="summary-card">
+            <div class="summary-row">
+                <div class="summary-item">
+                    <small id="stats-label">오늘 횟수</small>
+                    <b id="stats-count">0회</b>
+                </div>
+                <div class="divider-v"></div>
+                <div class="summary-item">
+                    <small id="stats-total-label">오늘 공덕액</small>
+                    <b id="stats-amount">0원</b>
+                </div>
             </div>
-            <div class="summary-item">
-                <small id="stats-total-label">오늘 공덕액</small>
-                <b id="stats-amount">0원</b>
+            <div class="stats-tabs">
+                <button class="tab-btn active" onclick="changeStats('today')">오늘</button>
+                <button class="tab-btn" onclick="changeStats('week')">이번 주</button>
+                <button class="tab-btn" onclick="changeStats('month')">이번 달</button>
+                <button class="tab-btn" onclick="changeStats('all')">누적</button>
             </div>
         </div>
-        <div class="stats-tabs">
-            <button class="tab-btn active" onclick="changeStats('today')">오늘</button>
-            <button class="tab-btn" onclick="changeStats('week')">이번 주</button>
-            <button class="tab-btn" onclick="changeStats('month')">이번 달</button>
-            <button class="tab-btn" onclick="changeStats('all')">전체</button>
+
+        <!-- 차시함 -->
+        <div class="box-section" id="ani-container">
+            <div class="shimine-box">
+                <div class="slot"></div>
+                <div class="lotus-icon">🪷</div>
+                <div class="box-text">차시함</div>
+            </div>
+        </div>
+
+        <!-- 입력 -->
+        <div class="input-area">
+            <input type="text" id="memo-input" placeholder="어떤 마음으로 차시하시나요?" maxlength="25">
+            <div class="money-grid" id="money-grid">
+                <!-- JS로 렌더링 -->
+            </div>
+        </div>
+
+        <!-- 오늘 기록 -->
+        <div class="history-section">
+            <div class="history-title">
+                <span>오늘의 수행 기록</span>
+            </div>
+            <ul id="history-list" class="history-list"></ul>
         </div>
     </div>
 
-    <div class="box-section" id="ani-container">
-        <div class="shimine-box">
-            <div class="slot"></div>
-            <div class="lotus-icon"></div>
-            <div class="box-text">차시함</div>
+    <!-- ═══ 지난 기록 페이지 ═══ -->
+    <div class="page hidden" id="page-past">
+        <div class="history-section">
+            <div class="history-title"><span>날짜별 수행 기록</span></div>
+            <div id="past-list"></div>
         </div>
     </div>
 
-    <div class="input-area">
-        <input type="text" id="memo-input" placeholder="어떤 마음으로 차시하시나요?" maxlength="20">
-        <div class="money-grid">
-            <button class="btn-money btn-coin" onclick="addChasi(10)">10</button>
-            <button class="btn-money btn-coin" onclick="addChasi(100)">100</button>
-            <button class="btn-money btn-coin" onclick="addChasi(500)">500</button>
-            <button class="btn-money btn-1000" onclick="addChasi(1000)">1,000</button>
-            <button class="btn-money btn-1000" onclick="addChasi(10000)">10,000</button>
-            
-            <div style="display: flex; gap: 4px;">
-                <button class="btn-money btn-custom" id="custom-btn" style="flex: 3;">
-                    <span id="custom-text">금액 설정</span>
-                </button>
-                <button class="btn-setting" onclick="setCustomAmount()" style="flex: 1.2;">⚙️</button>
+</div>
+
+<!-- ═══ 설정 모달 ═══ -->
+<div class="modal-overlay" id="settings-modal" onclick="closeSettingsOutside(event)">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">⚙️ 설정</div>
+
+        <!-- 고정 금액 버튼 설정 -->
+        <div class="setting-section">
+            <div class="setting-label">▪ 고정 금액 버튼 (자주 쓰는 금액)</div>
+            <div class="custom-amounts-grid" id="amounts-edit-grid">
+                <!-- JS 렌더링 -->
             </div>
+            <button class="btn-add-amount" onclick="addAmountSlot()" style="margin-top:8px; width:100%;">+ 금액 추가</button>
         </div>
-    </div>
 
-    <div class="history-section">
-        <span class="history-title">최근 수행 기록</span>
-        <ul id="history-list" class="history-list"></ul>
+        <!-- 저장 -->
+        <button class="btn-setting-save" onclick="saveSettings()" style="width:100%; padding:13px; font-size:0.95rem; margin-bottom:10px;">
+            💾 설정 저장
+        </button>
+
+        <!-- 위험 영역 -->
+        <div class="danger-zone">
+            <div class="setting-label">▪ 기록 관리</div>
+            <button class="btn-danger" onclick="undoLast()">↩ 마지막 기록 취소</button>
+            <button class="btn-danger" onclick="editRecordsMode()">✏️ 기록 수정 모드</button>
+            <button class="btn-danger" onclick="clearToday()" style="color:#c0392b;">🗑 오늘 기록 삭제</button>
+            <button class="btn-danger" onclick="clearAll()" style="color:#c0392b;">⚠️ 전체 초기화</button>
+        </div>
     </div>
 </div>
 
 <script>
-    let chasiLog = JSON.parse(localStorage.getItem('myChasiLog')) || [];
-    let customAmount = localStorage.getItem('customChasiAmount') || null;
-    let currentTab = 'today';
+// ── 데이터 초기화 ──
+let chasiLog = JSON.parse(localStorage.getItem('myChasiLog_v2')) || [];
+let settings = JSON.parse(localStorage.getItem('chasiSettings')) || {
+    fixedAmounts: [10, 100, 500, 1000, 10000]
+};
+let currentStatsTab = 'today';
+let editMode = false;
 
+// 앱 시작
+init();
+
+function init() {
+    renderMoneyGrid();
     updateUI();
+    updateSettingsModal();
+}
 
-    function addChasi(amount) {
-        if (!amount || amount <= 0) return;
-        const memoInput = document.getElementById('memo-input');
-        const newEntry = {
-            amount: parseInt(amount),
-            memo: memoInput.value.trim(),
-            timestamp: new Date().getTime()
-        };
-        chasiLog.push(newEntry);
-        saveData();
-        animateMoney(amount);
-        updateUI();
-        memoInput.value = "";
-    }
+// ── 금액 버튼 렌더링 ──
+function renderMoneyGrid() {
+    const grid = document.getElementById('money-grid');
+    const amounts = settings.fixedAmounts;
+    let html = '';
+    amounts.forEach((amt, i) => {
+        html += `<button class="btn-money btn-fixed" onclick="addChasi(${amt})">${amt.toLocaleString()}원</button>`;
+    });
+    grid.innerHTML = html;
+}
 
-    function animateMoney(amount) {
-        const container = document.getElementById('ani-container');
-        const aniNode = document.createElement('div');
-        aniNode.className = 'ani-money';
-        aniNode.innerText = "+" + amount.toLocaleString();
-        container.appendChild(aniNode);
-        setTimeout(() => aniNode.remove(), 1000);
-    }
+// ── 차시 추가 ──
+function addChasi(amount) {
+    if (!amount || amount <= 0) return;
+    const memoInput = document.getElementById('memo-input');
+    const newEntry = {
+        id: Date.now(),
+        amount: parseInt(amount),
+        memo: memoInput.value.trim(),
+        timestamp: new Date().getTime()
+    };
+    chasiLog.push(newEntry);
+    saveData();
+    animateMoney(amount);
+    updateUI();
+    memoInput.value = "";
+}
 
-    function changeStats(type) {
-        currentTab = type;
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if(btn.innerText.includes(type === 'today' ? '오늘' : type === 'week' ? '주' : type === 'month' ? '달' : '전체')) {
-                btn.classList.add('active');
-            }
+function animateMoney(amount) {
+    const container = document.getElementById('ani-container');
+    const aniNode = document.createElement('div');
+    aniNode.className = 'ani-money';
+    aniNode.innerText = "+" + parseInt(amount).toLocaleString();
+    container.appendChild(aniNode);
+    setTimeout(() => aniNode.remove(), 1000);
+}
+
+// ── 통계 탭 ──
+function changeStats(type) {
+    currentStatsTab = type;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    const tabMap = { today: 0, week: 1, month: 2, all: 3 };
+    document.querySelectorAll('.tab-btn')[tabMap[type]].classList.add('active');
+    updateUI();
+}
+
+// ── UI 전체 업데이트 ──
+function updateUI() {
+    updateStats();
+    renderTodayHistory();
+}
+
+function getFiltered(type) {
+    const now = new Date();
+    if (type === 'today') {
+        const todayStr = toDateStr(now);
+        return chasiLog.filter(item => toDateStr(new Date(item.timestamp)) === todayStr);
+    } else if (type === 'week') {
+        const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7); weekAgo.setHours(0,0,0,0);
+        return chasiLog.filter(item => item.timestamp >= weekAgo.getTime());
+    } else if (type === 'month') {
+        return chasiLog.filter(item => {
+            const d = new Date(item.timestamp);
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
         });
-        updateUI();
+    }
+    return chasiLog;
+}
+
+function updateStats() {
+    const filtered = getFiltered(currentStatsTab);
+    const total = filtered.reduce((s, i) => s + i.amount, 0);
+    const labels = { today: '오늘', week: '이번 주', month: '이번 달', all: '누적' };
+    const label = labels[currentStatsTab];
+    document.getElementById('stats-label').innerText = label + ' 횟수';
+    document.getElementById('stats-total-label').innerText = label + ' 공덕액';
+    document.getElementById('stats-count').innerText = filtered.length + '회';
+    document.getElementById('stats-amount').innerText = total.toLocaleString() + '원';
+}
+
+function renderTodayHistory() {
+    const todayStr = toDateStr(new Date());
+    const todayItems = chasiLog.filter(item => toDateStr(new Date(item.timestamp)) === todayStr).slice().reverse();
+    const list = document.getElementById('history-list');
+    if (todayItems.length === 0) {
+        list.innerHTML = '<div class="empty-state">오늘의 차시 기록이 없습니다<br>🙏</div>';
+        return;
+    }
+    list.innerHTML = todayItems.map(item => `
+        <li class="history-item">
+            <div class="history-info">
+                <span class="history-amount">${item.amount.toLocaleString()}원 차시</span>
+                <span class="history-memo">${item.memo || '일념(一念)으로 바칩니다'}</span>
+                <span class="history-date">${new Date(item.timestamp).toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'})}</span>
+            </div>
+            ${editMode ? `
+            <div class="history-actions">
+                <button class="btn-edit-item" onclick="editItem(${item.id})">수정</button>
+                <button class="btn-del-item" onclick="deleteItem(${item.id})">삭제</button>
+            </div>` : '<div style="font-size:1.4rem">🙏</div>'}
+        </li>
+    `).join('');
+}
+
+function renderPastHistory() {
+    const todayStr = toDateStr(new Date());
+    const pastItems = chasiLog.filter(item => toDateStr(new Date(item.timestamp)) !== todayStr);
+
+    const grouped = {};
+    pastItems.forEach(item => {
+        const d = toDateStr(new Date(item.timestamp));
+        if (!grouped[d]) grouped[d] = [];
+        grouped[d].push(item);
+    });
+
+    const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+    const container = document.getElementById('past-list');
+
+    if (sortedDates.length === 0) {
+        container.innerHTML = '<div class="empty-state">지난 기록이 없습니다<br>오늘부터 차시를 시작해보세요 🙏</div>';
+        return;
     }
 
-    function updateUI() {
-        const now = new Date();
-        let filtered = [];
-        let label = "오늘";
-
-        if (currentTab === 'today') {
-            const todayStr = now.toLocaleDateString();
-            filtered = chasiLog.filter(item => new Date(item.timestamp).toLocaleDateString() === todayStr);
-            label = "오늘";
-        } else if (currentTab === 'week') {
-            const lastWeek = new Date(now.setDate(now.getDate() - 7)).getTime();
-            filtered = chasiLog.filter(item => item.timestamp >= lastWeek);
-            label = "최근 7일";
-        } else if (currentTab === 'month') {
-            const thisMonth = now.getMonth();
-            const thisYear = now.getFullYear();
-            filtered = chasiLog.filter(item => {
-                const d = new Date(item.timestamp);
-                return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
-            });
-            label = "이번 달";
-        } else {
-            filtered = chasiLog;
-            label = "누적";
-        }
-
-        const totalAmount = filtered.reduce((sum, item) => sum + item.amount, 0);
-        
-        document.getElementById('stats-label').innerText = label + " 횟수";
-        document.getElementById('stats-total-label').innerText = label + " 공덕액";
-        document.getElementById('stats-count').innerText = filtered.length + "회";
-        document.getElementById('stats-amount').innerText = totalAmount.toLocaleString() + "원";
-
-        const customText = document.getElementById('custom-text');
-        customText.innerText = customAmount ? parseInt(customAmount).toLocaleString() + "원" : "금액 설정";
-
-        const listHtml = chasiLog.slice().reverse().slice(0, 10).map(item => `
+    container.innerHTML = sortedDates.map(dateStr => {
+        const items = grouped[dateStr];
+        const dayTotal = items.reduce((s, i) => s + i.amount, 0);
+        const itemsHtml = items.slice().reverse().map(item => `
             <li class="history-item">
                 <div class="history-info">
-                    <b>${item.amount.toLocaleString()}원 차시</b>
+                    <span class="history-amount">${item.amount.toLocaleString()}원 차시</span>
                     <span class="history-memo">${item.memo || '일념(一念)으로 바칩니다'}</span>
-                    <span class="history-date">${new Date(item.timestamp).toLocaleString()}</span>
+                    <span class="history-date">${new Date(item.timestamp).toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'})}</span>
                 </div>
-                <div style="color: var(--jg-gold); font-size: 1.5rem;">🙏</div>
+                ${editMode ? `
+                <div class="history-actions">
+                    <button class="btn-edit-item" onclick="editItem(${item.id})">수정</button>
+                    <button class="btn-del-item" onclick="deleteItem(${item.id})">삭제</button>
+                </div>` : '<div style="font-size:1.4rem">🙏</div>'}
             </li>
         `).join('');
-        document.getElementById('history-list').innerHTML = listHtml;
+        return `
+            <div class="date-group">
+                <div class="date-label">${formatDateLabel(dateStr)} <span class="date-group-total">${dayTotal.toLocaleString()}원</span></div>
+                <ul class="history-list">${itemsHtml}</ul>
+            </div>
+        `;
+    }).join('');
+}
+
+// ── 설정 모달 ──
+function openSettings() {
+    updateSettingsModal();
+    document.getElementById('settings-modal').classList.add('open');
+}
+function closeSettings() {
+    document.getElementById('settings-modal').classList.remove('open');
+}
+function closeSettingsOutside(e) {
+    if (e.target === document.getElementById('settings-modal')) closeSettings();
+}
+
+function updateSettingsModal() {
+    const grid = document.getElementById('amounts-edit-grid');
+    grid.innerHTML = settings.fixedAmounts.map((amt, i) => `
+        <div class="custom-amount-item">
+            <input type="number" value="${amt}" id="amt-input-${i}" placeholder="금액">
+            <button class="btn-remove-amount" onclick="removeAmountSlot(${i})">✕</button>
+        </div>
+    `).join('');
+}
+
+function addAmountSlot() {
+    settings.fixedAmounts.push(0);
+    updateSettingsModal();
+}
+
+function removeAmountSlot(i) {
+    if (settings.fixedAmounts.length <= 1) { alert('최소 1개는 있어야 합니다.'); return; }
+    settings.fixedAmounts.splice(i, 1);
+    updateSettingsModal();
+}
+
+function saveSettings() {
+    const inputs = document.querySelectorAll('[id^="amt-input-"]');
+    const newAmounts = [];
+    inputs.forEach(inp => {
+        const v = parseInt(inp.value);
+        if (!isNaN(v) && v > 0) newAmounts.push(v);
+    });
+    if (newAmounts.length === 0) { alert('유효한 금액을 입력해주세요.'); return; }
+    settings.fixedAmounts = newAmounts;
+    localStorage.setItem('chasiSettings', JSON.stringify(settings));
+    renderMoneyGrid();
+    closeSettings();
+    alert('설정이 저장되었습니다 🙏');
+}
+
+// ── 기록 수정/삭제 ──
+function editRecordsMode() {
+    editMode = !editMode;
+    closeSettings();
+    renderTodayHistory();
+    renderPastHistory();
+    if (editMode) alert('수정 모드가 활성화되었습니다.\n각 기록의 수정/삭제 버튼을 누르세요.');
+}
+
+function editItem(id) {
+    const item = chasiLog.find(i => i.id === id);
+    if (!item) return;
+    const newAmt = prompt('금액을 수정하세요:', item.amount);
+    if (newAmt === null) return;
+    const num = parseInt(newAmt.replace(/[^0-9]/g, ''));
+    if (isNaN(num) || num <= 0) { alert('올바른 금액을 입력해주세요.'); return; }
+    const newMemo = prompt('메모를 수정하세요:', item.memo || '');
+    if (newMemo === null) return;
+    item.amount = num;
+    item.memo = newMemo.trim();
+    saveData();
+    updateUI();
+    renderPastHistory();
+}
+
+function deleteItem(id) {
+    if (!confirm('이 기록을 삭제할까요?')) return;
+    chasiLog = chasiLog.filter(i => i.id !== id);
+    saveData();
+    updateUI();
+    renderPastHistory();
+}
+
+function undoLast() {
+    if (chasiLog.length === 0) { alert('취소할 기록이 없습니다.'); return; }
+    const last = chasiLog[chasiLog.length - 1];
+    if (confirm(`방금 입력한 [${last.amount.toLocaleString()}원] 기록을 취소할까요?`)) {
+        chasiLog.pop();
+        saveData();
+        updateUI();
+        renderPastHistory();
+        closeSettings();
     }
+}
 
-    function saveData() { localStorage.setItem('myChasiLog', JSON.stringify(chasiLog)); }
+function clearToday() {
+    const todayStr = toDateStr(new Date());
+    if (!confirm('오늘의 모든 기록을 삭제할까요?')) return;
+    chasiLog = chasiLog.filter(item => toDateStr(new Date(item.timestamp)) !== todayStr);
+    saveData();
+    updateUI();
+    closeSettings();
+}
 
-    function undoLast() {
-        if (chasiLog.length === 0) return;
-        if (confirm("방금 입력하신 기록을 취소할까요?")) {
-            chasiLog.pop();
-            saveData();
-            updateUI();
-        }
-    }
+function clearAll() {
+    if (!confirm('⚠️ 모든 기록을 영구 삭제합니다.\n정말 진행하시겠습니까?')) return;
+    chasiLog = [];
+    saveData();
+    updateUI();
+    renderPastHistory();
+    closeSettings();
+}
 
-    function clearAll() {
-        if (confirm("모든 기록을 삭제하시겠습니까?")) {
-            chasiLog = [];
-            saveData();
-            updateUI();
-        }
-    }
+// ── 페이지 전환 ──
+function switchPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-' + page).classList.remove('hidden');
+    const idx = page === 'main' ? 0 : 1;
+    document.querySelectorAll('.main-tab')[idx].classList.add('active');
+    if (page === 'past') renderPastHistory();
+}
 
-    document.getElementById('custom-btn').onclick = function() {
-        if (customAmount) addChasi(parseInt(customAmount));
-        else setCustomAmount();
-    };
+// ── 저장 & 유틸 ──
+function saveData() { localStorage.setItem('myChasiLog_v2', JSON.stringify(chasiLog)); }
 
-    function setCustomAmount() {
-        const val = prompt("자주 차시할 금액을 입력해주세요.", customAmount || "");
-        if (val !== null) {
-            const numVal = parseInt(val.replace(/[^0-9]/g, ''));
-            if (!isNaN(numVal) && numVal > 0) {
-                customAmount = numVal;
-                localStorage.setItem('customChasiAmount', numVal);
-                updateUI();
-                alert(numVal.toLocaleString() + "원으로 설정되었습니다.");
-            }
-        }
-    }
+function toDateStr(date) {
+    return date.getFullYear() + '-' +
+        String(date.getMonth()+1).padStart(2,'0') + '-' +
+        String(date.getDate()).padStart(2,'0');
+}
+
+function formatDateLabel(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    const days = ['일','월','화','수','목','금','토'];
+    return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+}
 </script>
 </body>
 </html>
